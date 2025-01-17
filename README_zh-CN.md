@@ -61,7 +61,7 @@ jobs:
 ```
 
 ### 5. 配置 GitHub Pages
-在 GitHub 仓库的设置中，启用 GitHub Pages，并选择 `gh-pages` 分支作为发布源。
+在 GitHub 仓库的设置中，启用 GitHub Pages，并选择 `gh-pages` 分支作为发布源。`gh-pages` 分支可以由 GitHub Actions 自动创建
 
 ### 6. 提交和推送更改
 将所有更改提交并推送到 GitHub：
