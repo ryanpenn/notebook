@@ -1,3 +1,4 @@
+homepage = 'https://ryanpenn.github.io/notebook/'
 baseURL = 'https://ryanpenn.github.io/notebook/'
 languageCode = 'en-us'
 title = 'My Notebook'
