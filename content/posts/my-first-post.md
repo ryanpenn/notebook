@@ -12,3 +12,5 @@ tags = ["hugo"]
 showTags = false
 hideBackToTop = false
 +++
+
+Hello Hugo!
