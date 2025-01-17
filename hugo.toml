@@ -1,5 +1,5 @@
-homepage = 'https://ryanpenn.github.io/notebook'
-baseURL = 'https://ryanpenn.github.io/notebook'
+homepage = 'https://ryanpenn.github.io/'
+baseURL = 'https://ryanpenn.github.io/'
 languageCode = 'en-us'
 title = 'My Notebook'
 theme = "typo"
@@ -37,15 +37,15 @@ url = "https://github.com/ryanpenn"
 # Main menu pages
 [[params.menu]]
 name = "home"
-url = "/notebook/"
+url = "/"
 
 [[params.menu]]
 name = "posts"
-url = "/notebook/posts"
+url = "/posts"
 
 [[params.menu]]
 name = "about"
-url = "/notebook/about"
+url = "/about"
 
 # Syntax highlight on code blocks
 [markup]
