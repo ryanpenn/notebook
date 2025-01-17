@@ -1,3 +1,4 @@
 .DS_Stroe
 thumbs.db
 .hugo_build.lock
+public/
