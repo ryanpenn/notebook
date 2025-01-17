@@ -37,15 +37,15 @@ url = "https://github.com/ryanpenn"
 # Main menu pages
 [[params.menu]]
 name = "home"
-url = "/"
+url = "/notebook/"
 
 [[params.menu]]
 name = "posts"
-url = "/posts"
+url = "/notebook/posts"
 
 [[params.menu]]
 name = "about"
-url = "/about"
+url = "/notebook/about"
 
 # Syntax highlight on code blocks
 [markup]
