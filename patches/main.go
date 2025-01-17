@@ -6,8 +6,9 @@ import (
 )
 
 func main() {
-	copyFile("cmd/res/fonts.css", "themes/typo/assets/css/fonts.css")
-	copyFile("cmd/res/404.html", "themes/typo/layouts/404.html")
+	// patch the context-path of fonts.css and 404.html for typo theme
+	copyFile("patches/typo/fonts.css", "themes/typo/assets/css/fonts.css")
+	copyFile("patches/typo/404.html", "themes/typo/layouts/404.html")
 }
 
 func copyFile(src, target string) error {
