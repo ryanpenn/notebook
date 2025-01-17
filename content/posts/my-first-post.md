@@ -13,4 +13,4 @@ showTags = false
 hideBackToTop = false
 +++
 
-Hello Hugo!
+Hello Hugo! Hello `typo` theme.
