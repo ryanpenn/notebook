@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'post.txt'
 
 jobs:
   build:
@@ -20,8 +18,8 @@ jobs:
       with:
         hugo-version: 'latest'
 
-    # - name: Install theme
-    #   run: git submodule update --init --recursive
+    - name: Install theme
+      run: git submodule update --init --recursive
 
     - name: Build site
       run: hugo --minify
