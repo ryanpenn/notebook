@@ -15,11 +15,11 @@ git remote add origin https://github.com/ryanpenn/notebook.git
 ```
 
 ### 3. Add a Theme
-Choose a Hugo theme and add it to your site. For example, use the [typo](https://github.com/tomfran/typo) theme:
+Choose a Hugo theme and add it to your site. For example, use the [hyde](https://github.com/spf13/hyde) theme:
 
 ```sh
-git submodule add https://github.com/tomfran/typo.git themes/typo
-echo 'theme = "typo"' >> hugo.toml
+git submodule add https://github.com/spf13/hyde.git themes/hyde
+echo 'theme = "hyde"' >> hugo.toml
 ```
 
 ### 4. Create a GitHub Actions Workflow
@@ -39,10 +39,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v2
+      uses: peaceiris/actions-hugo@v3
       with:
         hugo-version: 'latest'
 

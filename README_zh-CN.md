@@ -16,11 +16,11 @@ git remote add origin https://github.com/ryanpenn/notebook.git
 ```
 
 ### 3. 添加主题
-选择一个 Hugo 主题并添加到你的站点。例如，使用 [typo](https://github.com/tomfran/typo) 主题：
+选择一个 Hugo 主题并添加到你的站点。例如，使用 [hyde](https://github.com/spf13/hyde) 主题：
 
 ```sh
-git submodule add https://github.com/tomfran/typo.git themes/typo
-echo 'theme = "typo"' >> hugo.toml
+git submodule add https://github.com/spf13/hyde.git themes/hyde
+echo 'theme = "hyde"' >> hugo.toml
 ```
 
 ### 4. 创建 GitHub Actions 工作流
@@ -40,10 +40,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v2
+      uses: peaceiris/actions-hugo@v3
       with:
         hugo-version: 'latest'
 
