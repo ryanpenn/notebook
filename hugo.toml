@@ -1,53 +1,20 @@
-homepage = 'https://ryanpenn.github.io/notebook'
 baseURL = 'https://ryanpenn.github.io/notebook'
 languageCode = 'en-us'
-title = 'My Notebook'
-theme = "typo"
+title = 'Notebook'
+theme = "hyde"
 
-[taxonomies]
-tag = 'tags'
+[author]
+    name = "ryan"
+    homepage = "https://ryanpenn.github.io/notebook"
 
-# Appearance settings
-theme = 'auto'
-colorPalette = 'default'
-hideHeader = false
+[Menus]
+  main = [
+      {Name = "Posts", URL = "/posts/", Weight = 1},
+      {Name = "Tags", URL = "/tags/", Weight = 5},
+      {Name = "Github", URL = "https://github.com/ryanpenn/", Weight = 10},
+    ]
 
-# Intro on main page, content is markdown
-homeIntroTitle = 'Hi!'
-homeIntroContent = """
-Welcome to visite my site.
-"""
-
-# Collection to display on home
-homeCollectionTitle = 'Posts'
-homeCollection = 'posts'
-
-# Lists parameters
-paginationSize = 100
-listSummaries = true
-listDateFormat = '2 Jan 2006'
-
-# Breadcrumbs
-breadcrumbs = true
-
-[[params.social]]
-name = "github"
-url = "https://github.com/ryanpenn"
-
-# Main menu pages
-[[params.menu]]
-name = "home"
-url = "/notebook/"
-
-[[params.menu]]
-name = "posts"
-url = "/notebook/posts"
-
-[[params.menu]]
-name = "about"
-url = "/notebook/about"
-
-# Syntax highlight on code blocks
-[markup]
-[markup.highlight]
-style = 'algol'
+[params]
+  description = "My notes on software development and other things."
+  # 08 09 0a 0b 0c 0d 0e 0f
+  themeColor = "theme-base-0d"
