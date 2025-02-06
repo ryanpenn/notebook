@@ -1,0 +1,203 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en-us lang=en-us><head><link href=https://gmpg.org/xfn/11 rel=profile><meta charset=utf-8><meta name=generator content="Hugo 0.143.1"><meta name=viewport content="width=device-width,initial-scale=1"><title>[Ebitengine] (二) API手册 &#183; Notebook</title>
+<meta name=description content><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/print.css media=print><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/poole.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/syntax.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/hyde.css><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700"><link rel=apple-touch-icon-precomposed sizes=144x144 href=/apple-touch-icon-144-precomposed.png><link rel="shortcut icon" href=/favicon.png></head><body class=theme-base-0d><aside class=sidebar><div class="container sidebar-sticky"><div class=sidebar-about><a href=https://ryanpenn.github.io/notebook/><h1>Notebook</h1></a><p class=lead>My notes on software development and other things.</p></div><nav><ul class=sidebar-nav><li><a href=https://ryanpenn.github.io/notebook/>Home</a></li><li><a href=/notebook/posts/>Posts</a></li><li><a href=/notebook/tags/>Tags</a></li><li><a href=https://github.com/ryanpenn/>Github</a></li></ul></nav><p>&copy; 2025. All rights reserved.</p></div></aside><main class="content container"><div class=post><h1>[Ebitengine] (二) API手册</h1><time datetime=2025-02-06T14:42:23+0800 class=post-date>Thu, Feb 6, 2025</time><h2 id=overview>Overview</h2><p><img src=overview.png alt=overview></p><h2 id=general>General</h2><h3 id=ebitengame><code>ebiten.Game</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Game</span> <span style=color:#66d9ef>interface</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Update updates a game by one tick.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Update</span>() <span style=color:#66d9ef>error</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Draw draw the game screen. The given argument represents a screen image.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Draw</span>(<span style=color:#a6e22e>screen</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Layout accepts a native outside size in device-independent pixels and returns the game&#39;s logical</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// screen size. On desktops, the outside is a window or a monitor (fullscreen mode)</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>//</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Even though the outside size and the screen size differ, the rendering scale is automatically</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// adjusted to fit with the outside.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>//</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// You can return a fixed screen size if you don&#39;t care, or you can also return a calculated screen</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// size adjusted with the given outside size.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Layout</span>(<span style=color:#a6e22e>outsideWidth</span>, <span style=color:#a6e22e>outsideHeight</span> <span style=color:#66d9ef>int</span>) (<span style=color:#a6e22e>screenWidth</span>, <span style=color:#a6e22e>screenHeight</span> <span style=color:#66d9ef>int</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>Game</code> 接口定义.</p><h3 id=ebitenrungame><code>ebiten.RunGame</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>RunGame</span>(<span style=color:#a6e22e>game</span> <span style=color:#a6e22e>Game</span>) <span style=color:#66d9ef>error</span>
+</span></span></code></pre></div><p><code>RunGame</code> 运行游戏。游戏的更新在每个<code>tick</code>（默认情况下为 1/60 [s]）调用，游戏的绘制在每帧调用（对于 60Hz 显示，通常为 1/60[s]）。参数 (<code>*Image</code>) 是代表屏幕的渲染目标。</p><p>默认情况下，当窗口未获得焦点时，不会调用 <code>Update</code> 和 <code>Draw</code>。此设置可通过 <code>SetRunnableOnUnfocused</code> 进行配置。</p><p>当 (1).OpenGL 错误发生 (2).音频错误发生或 (3).游戏更新返回错误时，<code>RunGame</code> 返回错误。在 (3) 的情况下，<code>RunGame</code> 返回相同的错误。</p><p>不要在一个进程中调用 <code>RunGame</code> 两次或多次。</p><p>Game 和 RunGame 的典型代码是这样的：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>// Game implements ebiten.Game interface.</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Game</span> <span style=color:#66d9ef>struct</span>{}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Update proceeds the game state.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Update is called every tick (1/60 [s] by default).</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Game</span>) <span style=color:#a6e22e>Update</span>() <span style=color:#66d9ef>error</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Write your game&#39;s logical update.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Draw draws the game screen.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Draw is called every frame (typically 1/60[s] for 60Hz display).</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Game</span>) <span style=color:#a6e22e>Draw</span>(<span style=color:#a6e22e>screen</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>ebiten</span>.<span style=color:#a6e22e>Image</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Write your game&#39;s rendering.</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// If you don&#39;t have to adjust the screen size with the outside size, just return a fixed size.</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Game</span>) <span style=color:#a6e22e>Layout</span>(<span style=color:#a6e22e>outsideWidth</span>, <span style=color:#a6e22e>outsideHeight</span> <span style=color:#66d9ef>int</span>) (<span style=color:#a6e22e>screenWidth</span>, <span style=color:#a6e22e>screenHeight</span> <span style=color:#66d9ef>int</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>320</span>, <span style=color:#ae81ff>240</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>game</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>Game</span>{}
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Specify the window size as you like. Here, a doubled size is specified.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ebiten</span>.<span style=color:#a6e22e>SetWindowSize</span>(<span style=color:#ae81ff>640</span>, <span style=color:#ae81ff>480</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ebiten</span>.<span style=color:#a6e22e>SetWindowTitle</span>(<span style=color:#e6db74>&#34;Your game&#39;s title&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Call ebiten.RunGame to start your game loop.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ebiten</span>.<span style=color:#a6e22e>RunGame</span>(<span style=color:#a6e22e>game</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=ebitenrun><code>ebiten.Run</code></h3><blockquote><p>Run是为了向后兼容，被RunGame取代。</p></blockquote><h3 id=ebitenutildebugprint><code>ebitenutil.DebugPrint</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>DebugPrint</span>(<span style=color:#a6e22e>image</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>ebiten</span>.<span style=color:#a6e22e>Image</span>, <span style=color:#a6e22e>str</span> <span style=color:#66d9ef>string</span>)
+</span></span></code></pre></div><p>DebugPrint 在图像的左上角绘制字符串 <code>str</code> 。</p><h2 id=graphics>Graphics</h2><h3 id=ebitenimage><code>ebiten.Image</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Image</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// contains filtered or unexported fields</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>Image</code> 代表一个图像。 <code>Image</code> 实现了 <a href=https://golang.org/pkg/image/#Image>image.Image</a> 接口。</p><h3 id=ebitennewimage><code>ebiten.NewImage</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewImage</span>(<span style=color:#a6e22e>width</span>, <span style=color:#a6e22e>height</span> <span style=color:#66d9ef>int</span>) <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>
+</span></span></code></pre></div><p><code>NewImage</code> 创建一个新的空的图像。 <code>width</code> 和 <code>height</code> 是图像的宽度和高度，单位为像素。</p><h3 id=ebitennewimagefromimage><code>ebiten.NewImageFromImage</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewImageFromImage</span>(<span style=color:#a6e22e>img</span> <span style=color:#a6e22e>image</span>.<span style=color:#a6e22e>Image</span>) <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>
+</span></span></code></pre></div><p><code>NewImageFromImage</code> 从 <code>image.Image</code> 创建一个新的图像。</p><h3 id=ebitenimageclear><code>(*ebiten.Image).Clear</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>i</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>) <span style=color:#a6e22e>Clear</span>()
+</span></span></code></pre></div><p><code>Clear</code> 清除图像的所有像素(重置为0).</p><h3 id=ebitenimagefill><code>(*ebiten.Image).Fill</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>i</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>) <span style=color:#a6e22e>Fill</span>(<span style=color:#a6e22e>color</span> <span style=color:#a6e22e>color</span>.<span style=color:#a6e22e>Color</span>)
+</span></span></code></pre></div><p><code>Fill</code> 用颜色 <code>color</code> 填充图像的所有像素。</p><h3 id=ebitenimagesize><code>(*ebiten.Image).Size</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>i</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>) <span style=color:#a6e22e>Size</span>() (<span style=color:#a6e22e>width</span>, <span style=color:#a6e22e>height</span> <span style=color:#66d9ef>int</span>)
+</span></span></code></pre></div><p><code>Size</code> 返回图像的宽度和高度。</p><h3 id=ebitenimagesubimage><code>(*ebiten.Image).SubImage</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>i</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>) <span style=color:#a6e22e>SubImage</span>(<span style=color:#a6e22e>r</span> <span style=color:#a6e22e>image</span>.<span style=color:#a6e22e>Rectangle</span>) <span style=color:#a6e22e>image</span>.<span style=color:#a6e22e>Image</span>
+</span></span></code></pre></div><p><code>SubImage</code> 返回一个图像的子图像。 <code>r</code> 是子图像的矩形区域。</p><p>返回值为 <code>*ebiten.Image</code> 类型。</p><p>如果 <code>r</code> 被释放(<code>disposed</code>), 则返回 <code>nil</code>。</p><h3 id=ebitenimagedrawimage><code>(*ebiten.Image).DrawImage</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>i</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>) <span style=color:#a6e22e>DrawImage</span>(<span style=color:#a6e22e>src</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Image</span>, <span style=color:#a6e22e>op</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>DrawImageOptions</span>)
+</span></span></code></pre></div><p><code>DrawImage</code> 将 <code>src</code> 图像绘制到 <code>i</code> 图像上。 <code>op</code> 是绘制选项。</p><p><code>DrawImage</code> 更高效的使用批处理，当连续的 <code>DrawImage</code> 调用满足以下条件时：</p><ul><li>所有绘制目标都是相同的。<code>A in A.DrawImage(B, op)</code></li><li>所有混合模式都是相同的。</li><li>所有滤镜都是相同的。</li></ul><p>更多性能优化信息，请参阅 <a href=https://ebitengine.org/en/documents/performancetips.html>Performance Tips</a>。</p><h3 id=ebitendrawimageoptions><code>ebiten.DrawImageOptions</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>DrawImageOptions</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// GeoM is a geometry matrix to draw.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// The default (zero) value is identify, which draws the image at (0, 0).</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>GeoM</span> <span style=color:#a6e22e>GeoM</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// ColorScale is a scale of color.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// The default (zero) value is identity, which is (1, 1, 1, 1).</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ColorScale</span> <span style=color:#a6e22e>ColorScale</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Blend is a blending way of the source color and the destination color.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// The default (zero) value is regular alpha blending.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Blend</span> <span style=color:#a6e22e>Blend</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Filter is a type of texture filter.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// The default (zero) value is FilterNearest.</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Filter</span> <span style=color:#a6e22e>Filter</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>DrawImageOptions</code> 代表渲染图像的选项。</p><h3 id=ebitenfilter><code>ebiten.Filter</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Filter</span> <span style=color:#66d9ef>int</span>
+</span></span></code></pre></div><p><code>Filter</code> 代表用于放大或缩小图像的纹理过滤器类型。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>const</span> (
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// FilterNearest represents nearest (crisp-edged) filter</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>FilterNearest</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// FilterLinear represents linear filter</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>FilterLinear</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><h3 id=ebitengeom><code>ebiten.GeoM</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>GeoM</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// contains filtered or unexported fields</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>GeoM</code> 代表一个几何变换矩阵。初始值为单位矩阵。</p><h3 id=ebitengeomtranslate><code>(*ebiten.GeoM).Translate</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>GeoM</span>) <span style=color:#a6e22e>Translate</span>(<span style=color:#a6e22e>tx</span>, <span style=color:#a6e22e>ty</span> <span style=color:#66d9ef>float64</span>)
+</span></span></code></pre></div><p><code>Translate</code> 将矩阵平移 <code>(tx, ty)</code> 距离。</p><h3 id=ebitengeomscale><code>(*ebiten.GeoM).Scale</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>GeoM</span>) <span style=color:#a6e22e>Scale</span>(<span style=color:#a6e22e>sx</span>, <span style=color:#a6e22e>sy</span> <span style=color:#66d9ef>float64</span>)
+</span></span></code></pre></div><p><code>Scale</code> 将矩阵缩放 <code>(sx, sy)</code> 倍。</p><h3 id=ebitengeomrotate><code>(*ebiten.GeoM).Rotate</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>g</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>GeoM</span>) <span style=color:#a6e22e>Rotate</span>(<span style=color:#a6e22e>theta</span> <span style=color:#66d9ef>float64</span>)
+</span></span></code></pre></div><p><code>Rotate</code> 将矩阵绕原点旋转 <code>theta</code> 弧度。</p><h3 id=ebitencolorscale><code>ebiten.ColorScale</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>ColorScale</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>   <span style=color:#75715e>// contains filtered or unexported fields</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>ColorScale</code> 代表<code>RGBA</code>颜色缩放。初始值为单位颜色缩放。</p><h3 id=ebitencolorscalescale><code>(*ebiten.ColorScale).Scale</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>ColorScale</span>) <span style=color:#a6e22e>Scale</span>(<span style=color:#a6e22e>r</span>, <span style=color:#a6e22e>g</span>, <span style=color:#a6e22e>b</span>, <span style=color:#a6e22e>a</span> <span style=color:#66d9ef>float64</span>)
+</span></span></code></pre></div><p><code>Scale</code> 将颜色缩放 <code>(r, g, b, a)</code> 倍。</p><h3 id=ebitencolorscalescalealpha><code>(*ebiten.ColorScale).ScaleAlpha</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>ColorScale</span>) <span style=color:#a6e22e>ScaleAlpha</span>(<span style=color:#a6e22e>a</span> <span style=color:#66d9ef>float64</span>)
+</span></span></code></pre></div><p><code>ScaleAlpha</code> 将颜色的透明度缩放 <code>a</code> 倍。</p><h2 id=input>Input</h2><h3 id=ebiteniskeypressed><code>ebiten.IsKeyPressed</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>IsKeyPressed</span>(<span style=color:#a6e22e>key</span> <span style=color:#a6e22e>Key</span>) <span style=color:#66d9ef>bool</span>
+</span></span></code></pre></div><p><code>IsKeyPressed</code> 检查按键是否被按下。 <code>key</code> 是按键的标识符。</p><h3 id=inpututiliskeyjustpressed><code>inpututil.IsKeyJustPressed</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>IsKeyJustPressed</span>(<span style=color:#a6e22e>key</span> <span style=color:#a6e22e>Key</span>) <span style=color:#66d9ef>bool</span>
+</span></span></code></pre></div><p><code>IsKeyJustPressed</code> 检查按键是否刚刚被按下。 <code>key</code> 是按键的标识符。</p><h3 id=ebitenkey><code>ebiten.Key</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Key</span> <span style=color:#66d9ef>int</span>
+</span></span></code></pre></div><p><code>Key</code> 代表按键的标识符。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>const</span> (
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyA</span> <span style=color:#a6e22e>Key</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyB</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyC</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyD</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyE</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyG</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyH</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyI</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyJ</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyK</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyL</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyM</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyN</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyO</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyP</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyQ</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyR</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyS</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyT</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyU</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyV</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyW</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyX</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyY</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyZ</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyAltLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyAltRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyArrowDown</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyArrowLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyArrowRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyArrowUp</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyBackquote</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyBackslash</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyBackspace</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyBracketLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyBracketRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyCapsLock</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyComma</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyContextMenu</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyControlLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyControlRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDelete</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit0</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit1</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit2</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit3</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit4</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit5</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit6</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit7</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit8</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyDigit9</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyEnd</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyEnter</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyEqual</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyEscape</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF1</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF2</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF3</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF4</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF5</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF6</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF7</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF8</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF9</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF10</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF11</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyF12</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyHome</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyInsert</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyMetaLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyMetaRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyMinus</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyPageDown</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyPageUp</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyPause</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyPeriod</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyPrintScreen</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyQuote</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyScrollLock</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeySemicolon</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyShiftLeft</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyShiftRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeySlash</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeySpace</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyTab</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyAlt</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyControl</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyShift</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>KeyMeta</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><h3 id=ebitencursorposition><code>ebiten.CursorPosition</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>CursorPosition</span>() (<span style=color:#a6e22e>x</span>, <span style=color:#a6e22e>y</span> <span style=color:#66d9ef>int</span>)
+</span></span></code></pre></div><p><code>CursorPosition</code> 返回鼠标光标的位置。</p><h3 id=ebitenismousebuttonpressed><code>ebiten.IsMouseButtonPressed</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>IsMouseButtonPressed</span>(<span style=color:#a6e22e>button</span> <span style=color:#66d9ef>int</span>) <span style=color:#66d9ef>bool</span>
+</span></span></code></pre></div><p><code>IsMouseButtonPressed</code> 检查鼠标按钮是否被按下。 <code>button</code> 是鼠标按钮的标识符。</p><h3 id=inpututilismousebuttonjustpressed><code>inpututil.IsMouseButtonJustPressed</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>IsMouseButtonJustPressed</span>(<span style=color:#a6e22e>button</span> <span style=color:#66d9ef>int</span>) <span style=color:#66d9ef>bool</span>
+</span></span></code></pre></div><p><code>IsMouseButtonJustPressed</code> 检查鼠标按钮是否刚刚被按下。 <code>button</code> 是鼠标按钮的标识符。</p><h3 id=ebitenmousebutton><code>ebiten.MouseButton</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>MouseButton</span> <span style=color:#66d9ef>int</span>
+</span></span></code></pre></div><p><code>MouseButton</code> 代表鼠标按钮的标识符。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>const</span> (
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>MouseButtonLeft</span>   <span style=color:#a6e22e>MouseButton</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>MouseButtonRight</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>MouseButtonMiddle</span>
+</span></span></code></pre></div></div></main></body></html>
