@@ -15,6 +15,6 @@ theme = "hyde"
     ]
 
 [params]
-  description = "My notes on software development and other things."
+  description = "My notes on development and other things."
   # 08 09 0a 0b 0c 0d 0e 0f
   themeColor = "theme-base-0d"
