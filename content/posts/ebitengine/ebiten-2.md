@@ -11,7 +11,7 @@ tags = ["Ebitengine", "Golang"]
 
 ## Overview
 
-![overview](overview.png)
+![overview](../overview.png)
 
 ## General
 
