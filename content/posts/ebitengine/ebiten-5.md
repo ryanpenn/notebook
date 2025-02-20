@@ -1,12 +1,10 @@
 +++
-date = '2025-02-20T10:40:42+08:00'
+date = '2025-02-20T09:30:21+08:00'
 draft = false
 title = '[Ebitengine] (五) 动画状态机Animator'
 description = ""
 summary = "封装简单动画状态机Animator，实现不同动画间的切换。"
 tags = ["Ebitengine", "Golang"]
-# categories = [""]
-# menu = "main"
 +++
 
 ## 动画状态机Animator
