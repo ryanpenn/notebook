@@ -1,0 +1,141 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en-us lang=en-us><head><link href=https://gmpg.org/xfn/11 rel=profile><meta charset=utf-8><meta name=generator content="Hugo 0.144.2"><meta name=viewport content="width=device-width,initial-scale=1"><title>Go Event &#183; Notebook</title>
+<meta name=description content><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/print.css media=print><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/poole.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/syntax.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/hyde.css><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700"><link rel=apple-touch-icon-precomposed sizes=144x144 href=/apple-touch-icon-144-precomposed.png><link rel="shortcut icon" href=/favicon.png></head><body class=theme-base-0d><aside class=sidebar><div class="container sidebar-sticky"><div class=sidebar-about><a href=https://ryanpenn.github.io/notebook/><h1>Notebook</h1></a><p class=lead>My notes on development and other things.</p></div><nav><ul class=sidebar-nav><li><a href=https://ryanpenn.github.io/notebook/>Home</a></li><li><a href=/notebook/posts/>Posts</a></li><li><a href=/notebook/tags/>Tags</a></li><li><a href=https://github.com/ryanpenn/>Github</a></li></ul></nav><p>&copy; 2025. All rights reserved.</p></div></aside><main class="content container"><div class=post><h1>Go Event</h1><time datetime=2025-02-25T10:16:26+0800 class=post-date>Tue, Feb 25, 2025</time><h2 id=event-接口定义>Event 接口定义</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>// EventType 事件类型</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>EventType</span> <span style=color:#66d9ef>int</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// 实现 Event 接口</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>t</span> <span style=color:#a6e22e>EventType</span>) <span style=color:#a6e22e>Type</span>() <span style=color:#a6e22e>EventType</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>t</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Event 接口</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Event</span> <span style=color:#66d9ef>interface</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Type</span>() <span style=color:#a6e22e>EventType</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// EventHandler 事件处理函数</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>EventHandler</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>Event</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// EventBus 事件总线接口</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>EventBus</span> <span style=color:#66d9ef>interface</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>Event</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Subscribe</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>, <span style=color:#a6e22e>handler</span> <span style=color:#a6e22e>EventHandler</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Unsubscribe</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>, <span style=color:#a6e22e>handler</span> <span style=color:#a6e22e>EventHandler</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>UnsubscribeAll</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=eventbus-实现>EventBus 实现</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>eventbus</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>lock</span>     <span style=color:#f92672>*</span><span style=color:#a6e22e>sync</span>.<span style=color:#a6e22e>RWMutex</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// 事件类型 -&gt; 处理函数指针 -&gt; []处理函数 (支持多次订阅)</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>handlers</span> <span style=color:#66d9ef>map</span>[<span style=color:#a6e22e>EventType</span>]<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>uintptr</span>][]<span style=color:#a6e22e>EventHandler</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewEventBus</span>() <span style=color:#a6e22e>EventBus</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>eventbus</span>{
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>lock</span>:     <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>sync</span>.<span style=color:#a6e22e>RWMutex</span>{},
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>handlers</span>: <span style=color:#66d9ef>map</span>[<span style=color:#a6e22e>EventType</span>]<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>uintptr</span>][]<span style=color:#a6e22e>EventHandler</span>{},
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Publish 发布事件</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>eb</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>eventbus</span>) <span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>Event</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>RLock</span>()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>RUnlock</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>handlers</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>Type</span>()]
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>handler</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>handlers</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>fn</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>handler</span> {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>fn</span>(<span style=color:#a6e22e>event</span>)
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Subscribe 订阅事件</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>eb</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>eventbus</span>) <span style=color:#a6e22e>Subscribe</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>, <span style=color:#a6e22e>handler</span> <span style=color:#a6e22e>EventHandler</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Lock</span>()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Unlock</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>]; !<span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>] = <span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>uintptr</span>][]<span style=color:#a6e22e>EventHandler</span>{}
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ptr</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>reflect</span>.<span style=color:#a6e22e>ValueOf</span>(<span style=color:#a6e22e>handler</span>).<span style=color:#a6e22e>Pointer</span>()
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>] = append(<span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>], <span style=color:#a6e22e>handler</span>)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Unsubscribe 取消订阅事件</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>eb</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>eventbus</span>) <span style=color:#a6e22e>Unsubscribe</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>, <span style=color:#a6e22e>handler</span> <span style=color:#a6e22e>EventHandler</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Lock</span>()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Unlock</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>]; !<span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ptr</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>reflect</span>.<span style=color:#a6e22e>ValueOf</span>(<span style=color:#a6e22e>handler</span>).<span style=color:#a6e22e>Pointer</span>()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>]; !<span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>l</span> <span style=color:#f92672>:=</span> len(<span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>])
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>l</span> &gt; <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>] = <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>][:<span style=color:#a6e22e>l</span><span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> len(<span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>][<span style=color:#a6e22e>ptr</span>]) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>        delete(<span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>], <span style=color:#a6e22e>ptr</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// UnsubscribeAll 取消事件的所有订阅</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>eb</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>eventbus</span>) <span style=color:#a6e22e>UnsubscribeAll</span>(<span style=color:#a6e22e>etype</span> <span style=color:#a6e22e>EventType</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Lock</span>()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>lock</span>.<span style=color:#a6e22e>Unlock</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>]; !<span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>ptr</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>] {
+</span></span><span style=display:flex><span>        delete(<span style=color:#a6e22e>eb</span>.<span style=color:#a6e22e>handlers</span>[<span style=color:#a6e22e>etype</span>], <span style=color:#a6e22e>ptr</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=examples>Examples</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>MyEvent</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>Name</span> <span style=color:#66d9ef>string</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>Age</span>  <span style=color:#66d9ef>int</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>MyEvent</span>) <span style=color:#a6e22e>Type</span>() <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>EventType</span> {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>EventType</span>(<span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>NewEventBus</span>()
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// subscribe EventType(0) with anonymous handler</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Subscribe</span>(<span style=color:#ae81ff>0</span>, <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>Event</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;anonymous handler received: &#34;</span>, <span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>Type</span>())
+</span></span><span style=display:flex><span>	})
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>EventType</span>(<span style=color:#ae81ff>0</span>)) <span style=color:#75715e>// anonymous handler will receive this event</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>UnsubscribeAll</span>(<span style=color:#ae81ff>0</span>)              <span style=color:#75715e>// unsubscribe all handlers of EventType(0)</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>EventType</span>(<span style=color:#ae81ff>0</span>)) <span style=color:#75715e>// no handler will receive this event</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>handler1</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>Event</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>myEvent</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>event</span>.(<span style=color:#a6e22e>MyEvent</span>)
+</span></span><span style=display:flex><span>		println(<span style=color:#e6db74>&#34;handler1 received: &#34;</span>, <span style=color:#a6e22e>myEvent</span>.<span style=color:#a6e22e>Name</span>, <span style=color:#a6e22e>myEvent</span>.<span style=color:#a6e22e>Age</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>handler2</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>event</span> <span style=color:#a6e22e>eventbus</span>.<span style=color:#a6e22e>Event</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>myEvent</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>event</span>.(<span style=color:#a6e22e>MyEvent</span>)
+</span></span><span style=display:flex><span>		println(<span style=color:#e6db74>&#34;handler2 received: &#34;</span>, <span style=color:#a6e22e>myEvent</span>.<span style=color:#a6e22e>Name</span>, <span style=color:#a6e22e>myEvent</span>.<span style=color:#a6e22e>Age</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Subscribe</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>(), <span style=color:#a6e22e>handler1</span>)   <span style=color:#75715e>// subscribe event type 1 with handler1</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Subscribe</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>(), <span style=color:#a6e22e>handler1</span>)   <span style=color:#75715e>// subscribing twice will work as well</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Subscribe</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>(), <span style=color:#a6e22e>handler2</span>)   <span style=color:#75715e>// subscribe event type 1 with handler2</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>MyEvent</span>{<span style=color:#a6e22e>Name</span>: <span style=color:#e6db74>&#34;John&#34;</span>, <span style=color:#a6e22e>Age</span>: <span style=color:#ae81ff>30</span>}) <span style=color:#75715e>// all handlers will receive this event</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Unsubscribe</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>(), <span style=color:#a6e22e>handler1</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Unsubscribe</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>(), <span style=color:#a6e22e>handler2</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>MyEvent</span>{<span style=color:#a6e22e>Name</span>: <span style=color:#e6db74>&#34;Jane&#34;</span>, <span style=color:#a6e22e>Age</span>: <span style=color:#ae81ff>25</span>}) <span style=color:#75715e>// only one handler1 will receive this event</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>UnsubscribeAll</span>(<span style=color:#a6e22e>MyEvent</span>{}.<span style=color:#a6e22e>Type</span>())
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>bus</span>.<span style=color:#a6e22e>Publish</span>(<span style=color:#a6e22e>MyEvent</span>{<span style=color:#a6e22e>Name</span>: <span style=color:#e6db74>&#34;Bob&#34;</span>, <span style=color:#a6e22e>Age</span>: <span style=color:#ae81ff>40</span>}) <span style=color:#75715e>// no handler will receive this event</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=run-example>Run Example</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>go run .
+</span></span></code></pre></div></div></main></body></html>
