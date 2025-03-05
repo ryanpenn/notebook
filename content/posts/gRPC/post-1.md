@@ -1,7 +1,7 @@
 +++
 date = '2025-03-05T20:29:10+08:00'
 draft = false
-title = '【gRPC系列一】开发环境'
+title = '[gRPC系列一] 开发环境'
 summary = "在Go项目中使用gRPC进行通信"
 tags = ["gRPC", "Golang"]
 +++
