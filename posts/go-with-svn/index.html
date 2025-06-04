@@ -1,0 +1,55 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en-us lang=en-us><head><link href=https://gmpg.org/xfn/11 rel=profile><meta charset=utf-8><meta name=generator content="Hugo 0.147.7"><meta name=viewport content="width=device-width,initial-scale=1"><title>Go With Svn &#183; Notebook</title><meta name=description content><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/print.css media=print><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/poole.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/syntax.css><link type=text/css rel=stylesheet href=https://ryanpenn.github.io/notebook/css/hyde.css><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700"><link rel=apple-touch-icon-precomposed sizes=144x144 href=/apple-touch-icon-144-precomposed.png><link rel="shortcut icon" href=/favicon.png></head><body class=theme-base-0d><aside class=sidebar><div class="container sidebar-sticky"><div class=sidebar-about><a href=https://ryanpenn.github.io/notebook/><h1>Notebook</h1></a><p class=lead>My notes on development and other things.</p></div><nav><ul class=sidebar-nav><li><a href=https://ryanpenn.github.io/notebook/>Home</a></li><li><a href=/notebook/posts/>Posts</a></li><li><a href=/notebook/tags/>Tags</a></li><li><a href=https://github.com/ryanpenn/>Github</a></li></ul></nav><p>&copy; 2025. All rights reserved.</p></div></aside><main class="content container"><div class=post><h1>Go With Svn</h1><time datetime=2025-06-04T19:05:48+0800 class=post-date>Wed, Jun 4, 2025</time><h2 id=crate-a-go-project-and-add-it-to-svn>Crate a go project and add it to svn</h2><ul><li><code>go.mod</code></li></ul><pre tabindex=0><code>module server/utils-go
+
+go 1.24.1
+</code></pre><ul><li><code>utils.go</code></li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>utilsgo</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;github.com/bwmarrin/snowflake&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>nodeID</span> = <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Add</span>(<span style=color:#a6e22e>a</span>, <span style=color:#a6e22e>b</span> <span style=color:#66d9ef>int</span>) <span style=color:#66d9ef>int</span> {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>b</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><ul><li>submit to svn</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>svn add .
+</span></span><span style=display:flex><span>svn commit -m <span style=color:#e6db74>&#34;add go project&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 127.0.0.1:3690/svn/repos/server/utils-go</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># revision 1194</span>
+</span></span></code></pre></div><h2 id=use-the-go-project-in-another-project>Use the go project in another project</h2><ul><li><code>go.mod</code></li></ul><pre tabindex=0><code>module go-with-svn
+
+go 1.24.1
+
+require server/utils-go v0.0.0
+
+replace server/utils-go v0.0.0 =&gt; 127.0.0.1:3690/svn/repos/server/utils-go.svn 1194
+</code></pre><ul><li><code>main.go</code></li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>utilsgo</span> <span style=color:#e6db74>&#34;server/utils-go&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>result</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>utilsgo</span>.<span style=color:#a6e22e>Add</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Result: %d\n&#34;</span>, <span style=color:#a6e22e>result</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><ul><li>compile and run</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 1. Allow use SVN</span>
+</span></span><span style=display:flex><span>go env -w GOVCS<span style=color:#f92672>==</span>*:all
+</span></span><span style=display:flex><span><span style=color:#75715e># 2. Set GOPRIVATE</span>
+</span></span><span style=display:flex><span>go env -w GOPRIVATE<span style=color:#f92672>=</span>127.0.0.1:3690/svn/repos
+</span></span><span style=display:flex><span><span style=color:#75715e># 3. tidy</span>
+</span></span><span style=display:flex><span>go mod tidy
+</span></span><span style=display:flex><span><span style=color:#75715e># 4. run</span>
+</span></span><span style=display:flex><span>go run main.go
+</span></span><span style=display:flex><span><span style=color:#75715e># Result: 3</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># or use go add mod</span>
+</span></span><span style=display:flex><span>go get 127.0.0.1:3690/svn/repos/server/utils-go.svn@1194
+</span></span></code></pre></div><ul><li>final <code>go.mod</code></li></ul><pre tabindex=0><code>module go-with-svn
+
+go 1.24.1
+
+require server/utils-go v0.0.0
+
+replace server/utils-go v0.0.0 =&gt; 127.0.0.1:3690/svn/repos/server/utils-go.svn v0.0.0-20250604103236-00000001194
+</code></pre></div></main></body></html>
